@@ -50,6 +50,8 @@ app.get("/test-swagger", (req, res) => {
     paths: Object.keys(swaggerSpec.paths || {}),
   });
 });
+
+init(app);
 app.use(
   "/api-docs",
   swaggerUi.serve,
@@ -57,8 +59,6 @@ app.use(
     explorer: true,
   }),
 );
-init(app);
-
 await DbConnect();
 
 if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
