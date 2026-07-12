@@ -44,12 +44,7 @@ const swaggerOptions = {
 };
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 console.log("Swagger Paths:", Object.keys(swaggerSpec.paths || {}));
-app.get("/test-swagger", (req, res) => {
-  res.json({
-    status: "ok",
-    paths: Object.keys(swaggerSpec.paths || {}),
-  });
-});
+
 app.use(
   "/api-docs",
   swaggerUi.serve,
