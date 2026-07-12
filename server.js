@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import fs from "fs";
 import DbConnect from "./databases/dbConnect.js";
 import { init } from "./src/index.routes.js";
 
@@ -12,6 +13,9 @@ const port = process.env.PORT || 3000;
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+console.log("ROOT:", __dirname);
+console.log("FILES:", fs.readdirSync(__dirname));
+console.log("DOCS EXISTS:", fs.existsSync(path.join(__dirname, "docs")));
 dotenv.config();
 
 app.use(express.json());
