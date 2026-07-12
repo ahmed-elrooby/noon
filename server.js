@@ -30,6 +30,6 @@ app.set("query parser", "extended");
 // categories
 init(app);
 
-DbConnect();
+await DbConnect();
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 process.on("unhandledRejection", (err) => console.log(err));
