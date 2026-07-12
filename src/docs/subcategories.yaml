@@ -1,0 +1,149 @@
+paths:
+  /subcategories:
+    get:
+      tags:
+        - SubCategories
+      summary: Get all subcategories
+      description: Retrieve all subcategories.
+
+      responses:
+        "200":
+          description: Subcategories retrieved successfully
+
+    post:
+      tags:
+        - SubCategories
+      summary: Create subcategory
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - category
+              properties:
+                name:
+                  type: string
+                  example: Mobiles
+
+                category:
+                  type: string
+                  example: "6872f2b6d34ab1f0d4bcb123"
+
+      responses:
+        "200":
+          description: Subcategory created successfully
+        "400":
+          description: Validation error
+
+  /subcategories/{id}:
+    get:
+      tags:
+        - SubCategories
+      summary: Get single subcategory
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+
+      responses:
+        "200":
+          description: Subcategory retrieved successfully
+        "404":
+          description: Subcategory not found
+
+    put:
+      tags:
+        - SubCategories
+      summary: Update subcategory
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Smartphones
+
+      responses:
+        "200":
+          description: Subcategory updated successfully
+
+    delete:
+      tags:
+        - SubCategories
+      summary: Delete subcategory
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+
+      responses:
+        "200":
+          description: Subcategory deleted successfully
+        "404":
+          description: Subcategory not found
+
+  /categories/{categoryId}/subcategories:
+    get:
+      tags:
+        - SubCategories
+      summary: Get subcategories by category
+
+      parameters:
+        - in: path
+          name: categoryId
+          required: true
+          schema:
+            type: string
+
+      responses:
+        "200":
+          description: Subcategories retrieved successfully
+
+    post:
+      tags:
+        - SubCategories
+      summary: Create subcategory under category
+
+      parameters:
+        - in: path
+          name: categoryId
+          required: true
+          schema:
+            type: string
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: Mobiles
+
+      responses:
+        "200":
+          description: Subcategory created successfully

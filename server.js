@@ -2,10 +2,12 @@ import express from "express";
 import dotenv from "dotenv";
 import DbConnect from "./databases/dbConnect.js";
 import { init } from "./src/index.routes.js";
+
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 
 const port = process.env.PORT || 3000;
+
 const app = express();
 
 dotenv.config();
@@ -15,14 +17,16 @@ app.use("/", express.static("uploads/"));
 app.set("query parser", "extended");
 
 // Swagger Configuration
-const options = {
+const swaggerOptions = {
   definition: {
     openapi: "3.0.0",
+
     info: {
       title: "Noon API",
       version: "1.0.0",
-      description: "Noon E-commerce API Documentation",
+      description: "E-commerce API Documentation",
     },
+
     servers: [
       {
         url: "https://noon-six.vercel.app/api/v1",
@@ -33,13 +37,22 @@ const options = {
         description: "Local Server",
       },
     ],
+
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "apiKey",
+          in: "header",
+          name: "token",
+        },
+      },
+    },
   },
 
-  // اقرأ كل ملفات الـ YAML الموجودة داخل docs
   apis: ["./docs/*.yaml"],
 };
 
-const swaggerSpec = swaggerJsdoc(options);
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -48,9 +61,7 @@ init(app);
 await DbConnect();
 
 if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
-  app.listen(port, () => {
-    console.log(`Example app listening on port ${port}!`);
-  });
+  app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 }
 
 process.on("unhandledRejection", (err) => console.log(err));

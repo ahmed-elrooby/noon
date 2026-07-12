@@ -1,0 +1,84 @@
+paths:
+  /addresses:
+    patch:
+      tags:
+        - Addresses
+      summary: Add a new address
+      description: Add a new address to the authenticated user's address list.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - city
+                - street
+                - phone
+              properties:
+                city:
+                  type: string
+                  example: Beni Suef
+                street:
+                  type: string
+                  example: El Gomhoria Street
+                phone:
+                  type: string
+                  example: "01012345678"
+
+      responses:
+        "200":
+          description: Address added successfully
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+
+    get:
+      tags:
+        - Addresses
+      summary: Get logged user's addresses
+      description: Retrieve all addresses for the authenticated user.
+      security:
+        - bearerAuth: []
+
+      responses:
+        "200":
+          description: Addresses retrieved successfully
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+
+    delete:
+      tags:
+        - Addresses
+      summary: Remove an address
+      description: Delete an address from the authenticated user's addresses.
+      security:
+        - bearerAuth: []
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - addressId
+              properties:
+                addressId:
+                  type: string
+                  example: 6872f2b6d34ab1f0d4bcb123
+
+      responses:
+        "200":
+          description: Address removed successfully
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Address not found

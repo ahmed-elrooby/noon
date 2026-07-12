@@ -1,0 +1,113 @@
+paths:
+  /carts:
+    post:
+      tags:
+        - Cart
+      summary: Add product to cart
+      description: Add a product to the logged-in user's cart.
+      security:
+        - bearerAuth: []
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - productId
+              properties:
+                productId:
+                  type: string
+                  example: "6872f2b6d34ab1f0d4bcb123"
+                quantity:
+                  type: integer
+                  example: 1
+
+      responses:
+        "200":
+          description: Product added to cart successfully
+        "400":
+          description: Validation error
+        "401":
+          description: Unauthorized
+        "404":
+          description: Product not found
+
+    get:
+      tags:
+        - Cart
+      summary: Get logged user cart
+      description: Retrieve the authenticated user's shopping cart.
+      security:
+        - bearerAuth: []
+
+      responses:
+        "200":
+          description: Cart retrieved successfully
+        "401":
+          description: Unauthorized
+
+  /carts/{id}:
+    put:
+      tags:
+        - Cart
+      summary: Update product quantity
+      description: Update the quantity of a product in the user's cart.
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: "6872f2b6d34ab1f0d4bcb123"
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - quantity
+              properties:
+                quantity:
+                  type: integer
+                  example: 3
+
+      responses:
+        "200":
+          description: Cart updated successfully
+        "400":
+          description: Validation error
+        "401":
+          description: Unauthorized
+        "404":
+          description: Cart item not found
+
+    delete:
+      tags:
+        - Cart
+      summary: Remove product from cart
+      description: Remove a product from the authenticated user's cart.
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: "6872f2b6d34ab1f0d4bcb123"
+
+      responses:
+        "200":
+          description: Product removed successfully
+        "401":
+          description: Unauthorized
+        "404":
+          description: Cart item not found
