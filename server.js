@@ -2,7 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import DbConnect from "./databases/dbConnect.js";
 import { init } from "./src/index.routes.js";
-
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./swagger/swaggerDocs.js";
 const port = process.env.PORT || 3000;
 const app = express();
 
@@ -13,7 +14,7 @@ app.use("/", express.static("uploads/"));
 app.set("query parser", "extended");
 
 init(app);
-
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 await DbConnect();
 
 if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {

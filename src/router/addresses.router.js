@@ -10,7 +10,6 @@ import {
 } from "../controller/address/addresses.controller.js";
 
 const addressRouter = express.Router();
-
 addressRouter
   .route("/")
   .patch(protectedRoutes, allowedTo("user"), createAddress)
