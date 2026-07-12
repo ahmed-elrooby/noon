@@ -1,0 +1,79 @@
+openapi: 3.0.0
+
+tags:
+  - name: Auth
+    description: Authentication APIs
+
+paths:
+  /auth/signUp:
+    post:
+      tags:
+        - Auth
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+                - rePassword
+                - phone
+              properties:
+                name:
+                  type: string
+                  example: Ahmed Eid
+                email:
+                  type: string
+                  example: ahmed@gmail.com
+                password:
+                  type: string
+                  example: Ahmed@123
+                rePassword:
+                  type: string
+                  example: Ahmed@123
+                phone:
+                  type: string
+                  example: "01012345678"
+
+      responses:
+        "200":
+          description: User created successfully
+
+        "400":
+          description: User already exists
+
+  /auth/signIn:
+    post:
+      tags:
+        - Auth
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: ahmed@gmail.com
+                password:
+                  type: string
+                  example: Ahmed@123
+
+      responses:
+        "200":
+          description: Login successful
+
+        "401":
+          description: Invalid email or password
+
+        "404":
+          description: User not found
