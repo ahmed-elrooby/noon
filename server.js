@@ -13,8 +13,9 @@ app.use(express.json());
 app.use("/", express.static("uploads/"));
 app.set("query parser", "extended");
 
-init(app);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+init(app);
 await DbConnect();
 
 if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
