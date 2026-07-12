@@ -5,7 +5,6 @@ import { orderModel } from "../../../databases/models/order.model.js";
 import { productModel } from "../../../databases/models/product.model.js";
 import Stripe from "stripe";
 // console.log("Stripe:", process.env.STRIPE_SECRET_KEY);
-import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 /*
