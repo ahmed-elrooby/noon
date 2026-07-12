@@ -11,9 +11,17 @@ const options = {
     servers: [
       {
         url: "https://noon-six.vercel.app",
-        description: "Production Server",
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
   },
 
   apis: ["./src/router/*.js"],
