@@ -29,7 +29,7 @@ const authRouter = express.Router();
  *       201:
  *         description: User created successfully
  */
-router.post("/signup", signup);
+
 authRouter.post("/signUp", signUp);
 authRouter.post("/signIn", signIn);
 
