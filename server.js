@@ -50,8 +50,13 @@ app.get("/test-swagger", (req, res) => {
     paths: Object.keys(swaggerSpec.paths || {}),
   });
 });
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    explorer: true,
+  }),
+);
 init(app);
 
 await DbConnect();
