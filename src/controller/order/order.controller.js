@@ -4,9 +4,16 @@ import AppError from "../../utils/AppError.js";
 import { orderModel } from "../../../databases/models/order.model.js";
 import { productModel } from "../../../databases/models/product.model.js";
 import Stripe from "stripe";
-// console.log("Stripe:", process.env.STRIPE_SECRET_KEY);
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+
+if (!stripeSecretKey) {
+  console.warn(
+    "STRIPE_SECRET_KEY is not set. Checkout routes will be unavailable.",
+  );
+}
+
+const stripe = stripeSecretKey ? new Stripe(stripeSecretKey) : null;
 /*
 1- get cart by id 
 2- calc totalOrderdPrice 
@@ -72,6 +79,10 @@ const getAllOrders = catchAsyncError(async (req, res, next) => {
   res.json({ message: "success", orders });
 });
 const checkOutSession = catchAsyncError(async (req, res, next) => {
+  if (!stripe) {
+    return next(new AppError("Stripe is not configured", 500));
+  }
+
   const cart = await cartModel.findById(req.params.id);
   if (!cart) {
     return next(new AppError("cart not found", 404));
