@@ -36,6 +36,7 @@ const swaggerOptions = {
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
+console.log("Swagger Paths:", Object.keys(swaggerSpec.paths || {}));
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
