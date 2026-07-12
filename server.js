@@ -35,7 +35,7 @@ const swaggerOptions = {
 
     servers: [
       {
-        url: "https://noon-coral.vercel.app/api/v1",
+        url: "https://noon-six.vercel.app/api/v1",
       },
     ],
   },
