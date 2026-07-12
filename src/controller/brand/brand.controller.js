@@ -8,7 +8,7 @@ import {
 import { ApiFeature } from "../../utils/ApiFeature.js";
 
 const createBrand = async (req, res) => {
-  req.body.logo = req.file.filename;
+  req.body.logo = req.file?.secure_url || req.file?.url || req.file?.filename;
   req.body.slug = slugify(req.body.name);
   const result = new brandModel(req.body);
   await result.save();

@@ -5,7 +5,7 @@ import catchAsyncError from "../../middleware/catchAsyncError.js";
 import { ApiFeature } from "../../utils/ApiFeature.js";
 
 const createCategory = catchAsyncError(async (req, res) => {
-  req.body.image = req.file.filename;
+  req.body.image = req.file?.secure_url || req.file?.url || req.file?.filename;
   req.body.slug = slugify(req.body.name);
   const result = new categoryModel(req.body);
   await result.save();

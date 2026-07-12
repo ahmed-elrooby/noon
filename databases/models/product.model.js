@@ -98,13 +98,13 @@ productSchema.virtual("reviews", {
   localField: "_id",
 });
 productSchema.post("init", (doc) => {
-  if (doc.imgCover) {
+  if (doc.imgCover && !doc.imgCover.startsWith("http")) {
     doc.imgCover = `${process.env.BASE_URL}/products/${doc.imgCover}`;
   }
 
   if (doc.images?.length) {
-    doc.images = doc.images.map(
-      (img) => `${process.env.BASE_URL}/products/${img}`,
+    doc.images = doc.images.map((img) =>
+      img.startsWith("http") ? img : `${process.env.BASE_URL}/products/${img}`,
     );
   }
 });

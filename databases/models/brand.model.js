@@ -24,7 +24,8 @@ const brandSchema = mongoose.Schema(
   },
 );
 brandSchema.post("init", (doc) => {
-  console.log(doc.logo);
-  doc.logo = `${process.env.BASE_URL}/brands/${doc.logo}`;
+  if (doc.logo && !doc.logo.startsWith("http")) {
+    doc.logo = `${process.env.BASE_URL}/brands/${doc.logo}`;
+  }
 });
 export const brandModel = mongoose.model("brand", brandSchema);

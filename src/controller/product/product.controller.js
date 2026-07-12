@@ -4,10 +4,21 @@ import { ApiFeature } from "../../utils/ApiFeature.js";
 import AppError from "../../utils/AppError.js";
 
 const createProduct = async (req, res, next) => {
-  console.log(req.files);
   req.body.slug = slugify(req.body.title);
-  req.body.imgCover = req.files.imgCover[0].filename;
-  req.body.images = req.files.images.map((ele) => ele.filename);
+
+  if (req.files?.imgCover?.[0]) {
+    req.body.imgCover =
+      req.files.imgCover[0].secure_url ||
+      req.files.imgCover[0].url ||
+      req.files.imgCover[0].filename;
+  }
+
+  if (req.files?.images?.length) {
+    req.body.images = req.files.images.map(
+      (ele) => ele.secure_url || ele.url || ele.filename,
+    );
+  }
+
   const result = new productModel(req.body);
   await result.save();
   res.json({ message: "product created successfully", result });
