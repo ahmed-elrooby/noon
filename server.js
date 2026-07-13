@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import fs from "fs";
 import DbConnect from "./databases/dbConnect.js";
 import { init } from "./src/index.routes.js";
-
+import cors from "cors";
 import YAML from "yamljs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -12,6 +12,13 @@ dotenv.config();
 const port = process.env.PORT || 3000;
 
 const app = express();
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 console.log("ROOT:", __dirname);
