@@ -4,7 +4,6 @@ import fs from "fs";
 import DbConnect from "./databases/dbConnect.js";
 import { init } from "./src/index.routes.js";
 
-import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
 import path from "path";
@@ -25,80 +24,45 @@ app.use("/", express.static("uploads/"));
 app.set("query parser", "extended");
 
 // Swagger Configuration
-const swaggerOptions = {
-  definition: {
-    openapi: "3.0.0",
+const swaggerServerUrl =
+  (process.env.BASE_URL ? `${process.env.BASE_URL}/api/v1` : undefined) ||
+  "http://localhost:3000/api/v1";
 
-    info: {
-      title: "Noon API",
-      version: "1.0.0",
-      description: "E-commerce API Documentation",
-    },
-
-    servers: [
-      {
-        url:
-          (process.env.BASE_URL
-            ? `${process.env.BASE_URL}/api/v1`
-            : undefined) || "http://localhost:3000/api/v1",
-      },
-    ],
+const swaggerSpec = {
+  openapi: "3.0.0",
+  info: {
+    title: "Noon API",
+    version: "1.0.0",
+    description: "E-commerce API Documentation",
   },
-
-  apis: [path.join(__dirname, "docs", "*.yaml")],
+  servers: [
+    {
+      url: swaggerServerUrl,
+    },
+  ],
+  paths: {},
+  components: {},
+  tags: [],
 };
 
-let swaggerSpec = swaggerJsdoc(swaggerOptions);
-if (
-  !swaggerSpec ||
-  typeof swaggerSpec !== "object" ||
-  !swaggerSpec.paths ||
-  Object.keys(swaggerSpec.paths).length === 0
-) {
-  const swaggerDoc = {
-    openapi: "3.0.0",
-    info: {
-      title: "Noon API",
-      version: "1.0.0",
-      description: "E-commerce API Documentation",
-    },
-    servers: [
-      {
-        url:
-          (process.env.BASE_URL
-            ? `${process.env.BASE_URL}/api/v1`
-            : undefined) || "http://localhost:3000/api/v1",
-      },
-    ],
-    paths: {},
-    components: {},
-    tags: [],
-  };
+const docsDir = path.join(__dirname, "docs");
+if (fs.existsSync(docsDir)) {
+  const yamlFiles = fs
+    .readdirSync(docsDir)
+    .filter((file) => file.endsWith(".yaml") || file.endsWith(".yml"));
 
-  const docsDir = path.join(__dirname, "docs");
-  if (fs.existsSync(docsDir)) {
-    const yamlFiles = fs
-      .readdirSync(docsDir)
-      .filter((file) => file.endsWith(".yaml") || file.endsWith(".yml"));
-
-    for (const yamlFile of yamlFiles) {
-      const doc = YAML.load(path.join(docsDir, yamlFile));
-      if (doc?.paths) {
-        swaggerDoc.paths = { ...swaggerDoc.paths, ...doc.paths };
-      }
-      if (doc?.components) {
-        swaggerDoc.components = {
-          ...swaggerDoc.components,
-          ...doc.components,
-        };
-      }
-      if (doc?.tags) {
-        swaggerDoc.tags = [...swaggerDoc.tags, ...doc.tags];
-      }
+  for (const yamlFile of yamlFiles) {
+    const doc = YAML.load(path.join(docsDir, yamlFile));
+    if (doc?.paths) {
+      Object.assign(swaggerSpec.paths, doc.paths);
+    }
+    if (doc?.components) {
+      Object.assign(swaggerSpec.components, doc.components);
+    }
+    if (doc?.tags) {
+      swaggerSpec.tags.push(...doc.tags);
     }
   }
-
-  swaggerSpec = swaggerDoc;
 }
 
 console.log("Swagger Paths:", Object.keys(swaggerSpec.paths || {}).length);
@@ -111,9 +75,17 @@ app.use(
   }),
 );
 
+app.get("/api-docs.json", (req, res) => {
+  res.json(swaggerSpec);
+});
+
 init(app);
 
-await DbConnect();
+try {
+  await DbConnect();
+} catch (err) {
+  console.error("DB Connection Error:", err);
+}
 
 if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
   app.listen(port, () => console.log(`Example app listening on port ${port}!`));
