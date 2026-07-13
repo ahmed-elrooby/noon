@@ -4,7 +4,6 @@ import fs from "fs";
 import DbConnect from "./databases/dbConnect.js";
 import { init } from "./src/index.routes.js";
 
-import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -67,13 +66,35 @@ if (fs.existsSync(docsDir)) {
 
 console.log("Swagger Paths:", Object.keys(swaggerSpec.paths || {}).length);
 
-app.use(
-  "/api-docs",
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerSpec, {
-    explorer: true,
-  }),
-);
+app.get("/api-docs", (req, res) => {
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Noon API Docs</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+  <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js"></script>
+  <script>
+    window.onload = () => {
+      SwaggerUIBundle({
+        url: "/api-docs.json",
+        dom_id: "#swagger-ui",
+        presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+        layout: "BaseLayout",
+        deepLinking: true,
+        explorer: true,
+      });
+    };
+  </script>
+</body>
+</html>`);
+});
 
 app.get("/api-docs.json", (req, res) => {
   res.json(swaggerSpec);
