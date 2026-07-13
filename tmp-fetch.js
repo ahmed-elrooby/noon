@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-const url = "http://localhost:3000/api-docs";
+const url = "https://noon-six.vercel.app/api-docs";
 const res = await fetch(url);
 console.log("status", res.status);
 console.log("content-type", res.headers.get("content-type"));

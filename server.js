@@ -25,7 +25,7 @@ app.set("query parser", "extended");
 // Swagger Configuration
 const swaggerServerUrl =
   (process.env.BASE_URL ? `${process.env.BASE_URL}/api/v1` : undefined) ||
-  "http://localhost:3000/api/v1";
+  "https://noon-six.vercel.app/api/v1";
 
 const swaggerSpec = {
   openapi: "3.0.0",
