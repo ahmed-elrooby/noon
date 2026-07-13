@@ -47,7 +47,20 @@ const swaggerSpec = {
     },
   ],
   paths: {},
-  components: {},
+  components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+      },
+    },
+  },
+  security: [
+    {
+      bearerAuth: [],
+    },
+  ],
   tags: [],
 };
 
