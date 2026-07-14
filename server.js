@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import DbConnect from "./databases/dbConnect.js";
 import { init } from "./src/index.routes.js";
 import cors from "cors";
+import { createOnlineOrder } from "./src/controller/order/order.controller.js";
 
 dotenv.config();
 const port = process.env.PORT || 3000;
@@ -15,7 +16,11 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
-
+app.post(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  createOnlineOrder,
+);
 app.use(express.json());
 app.use("/", express.static("uploads/"));
 app.set("query parser", "extended");

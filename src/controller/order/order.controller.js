@@ -114,4 +114,38 @@ const checkOutSession = catchAsyncError(async (req, res, next) => {
   });
   res.json({ message: "success", session });
 });
-export { createCashOrder, getMyOrders, getAllOrders, checkOutSession };
+const createOnlineOrder = catchAsyncError((request, response) => {
+  let event = request.body;
+  // Only verify the event if you have an endpoint secret defined.
+  // Otherwise use the basic event deserialized with JSON.parse
+  // Get the signature sent by Stripe
+  const signature = request.headers["stripe-signature"].toString();
+  try {
+    event = stripe.webhooks.constructEvent(
+      request.body,
+      signature,
+      "whsec_wyMe5oH9XB8eEbIEpUNbi4wbg85bEZ1T",
+    );
+  } catch (err) {
+    console.log(`⚠️  Webhook signature verification failed.`, err.message);
+    return response.sendStatus(400);
+  }
+
+  // Handle the event
+  if (event.type === "payment_intent.succeeded") {
+    const paymentIntent = event.data.object;
+    console.log(`PaymentIntent for ${paymentIntent.amount} was successful!`);
+  } else {
+    console.log(`Unhandled event type ${event.type}.`);
+  }
+
+  // Return a 200 response to acknowledge receipt of the event
+  response.send();
+});
+export {
+  createCashOrder,
+  getMyOrders,
+  getAllOrders,
+  checkOutSession,
+  createOnlineOrder,
+};
