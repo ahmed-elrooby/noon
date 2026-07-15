@@ -110,37 +110,76 @@ const checkOutSession = catchAsyncError(async (req, res, next) => {
     metadata: {
       cartId: cart._id.toString(),
       userId: req.user._id.toString(),
+      street: req.body.shippingAddress.street,
+      city: req.body.shippingAddress.city,
+      phone: req.body.shippingAddress.phone,
     },
   });
   res.json({ message: "success", session });
 });
-const createOnlineOrder = catchAsyncError((request, response) => {
-  let event = request.body;
-  // Only verify the event if you have an endpoint secret defined.
-  // Otherwise use the basic event deserialized with JSON.parse
-  // Get the signature sent by Stripe
-  const signature = request.headers["stripe-signature"].toString();
+const createOnlineOrder = catchAsyncError(async (req, res, next) => {
+  const signature = req.headers["stripe-signature"];
+
+  let event;
+
   try {
     event = stripe.webhooks.constructEvent(
-      request.body,
+      req.body,
       signature,
-      "whsec_wyMe5oH9XB8eEbIEpUNbi4wbg85bEZ1T",
+      process.env.STRIPE_WEBHOOK_SECRET,
     );
   } catch (err) {
-    console.log(`⚠️  Webhook signature verification failed.`, err.message);
-    return response.sendStatus(400);
+    console.log(err.message);
+    return res.sendStatus(400);
   }
 
-  // Handle the event
-  if (event.type === "payment_intent.succeeded") {
-    const paymentIntent = event.data.object;
-    console.log(`PaymentIntent for ${paymentIntent.amount} was successful!`);
-  } else {
-    console.log(`Unhandled event type ${event.type}.`);
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+
+    const { cartId, userId, street, city, phone } = session.metadata;
+
+    const cart = await cartModel.findById(cartId);
+
+    if (!cart) {
+      return next(new AppError("Cart not found", 404));
+    }
+
+    const totalOrderedPrice = cart.totalPriceAfterDiscount || cart.totalPrice;
+
+    await orderModel.create({
+      userId,
+      cartItems: cart.cartItems,
+      totalOrderedPrice,
+      shippingAddress: {
+        street,
+        city,
+        phone,
+      },
+      paymentMethod: "card",
+      isPaid: true,
+      paidAt: Date.now(),
+    });
+
+    const options = cart.cartItems.map((item) => ({
+      updateOne: {
+        filter: { _id: item.productId },
+        update: {
+          $inc: {
+            quantity: -item.quantity,
+            sold: item.quantity,
+          },
+        },
+      },
+    }));
+
+    await productModel.bulkWrite(options);
+
+    await cartModel.findByIdAndDelete(cartId);
   }
 
-  // Return a 200 response to acknowledge receipt of the event
-  response.send();
+  res.status(200).json({
+    received: true,
+  });
 });
 export {
   createCashOrder,
